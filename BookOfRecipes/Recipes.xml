@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<recipes>
+  <recipe id="1">
+    <name></name>
+    <ingridients>
+      <ingridient>
+        <name></name>
+        <quantity measure=""></quantity>
+      </ingridient>
+    </ingridients>
+    <cooking></cooking>
+    <numberOfServings></numberOfServings>
+    <caloricContent>
+      <proteins></proteins>
+      <fats></fats>
+      <carbohydrates></carbohydrates>
+    </caloricContent>
+  </recipe>
+</recipes>
