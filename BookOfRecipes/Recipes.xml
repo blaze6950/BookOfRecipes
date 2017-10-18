@@ -1,19 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <recipes>
   <recipe id="1">
-    <name></name>
+    <name>Каша</name>
     <ingridients>
       <ingridient>
-        <name></name>
-        <quantity measure=""></quantity>
+        <name>Овсянка</name>
+        <quantity measure="гр">300</quantity>
+      </ingridient>
+      <ingridient>
+        <name>Вода</name>
+        <quantity measure="мл">500</quantity>
       </ingridient>
     </ingridients>
-    <cooking></cooking>
-    <numberOfServings></numberOfServings>
+    <cooking>Залить овсянку водой, поставить в микроволновку на 3 минуты</cooking>
+    <numberOfServings>1</numberOfServings>
     <caloricContent>
-      <proteins></proteins>
-      <fats></fats>
-      <carbohydrates></carbohydrates>
+      <proteins>456</proteins>
+      <fats>65</fats>
+      <carbohydrates>355</carbohydrates>
     </caloricContent>
   </recipe>
 </recipes>
