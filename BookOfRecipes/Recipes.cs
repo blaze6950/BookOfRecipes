@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 
 namespace BookOfRecipes
@@ -22,35 +21,38 @@ namespace BookOfRecipes
 
             var recipes = doc.DocumentElement;
 
-            foreach (XmlNode recipe in recipes.ChildNodes)
-            {
-                Recipe newRecipe = new Recipe();
-                newRecipe.Id = Int32.Parse(recipe.Attributes["id"].Value);
-                newRecipe.Name = recipe["name"].InnerText;
-                foreach (XmlNode ingridient in recipe["ingridients"].ChildNodes)
+            if (recipes != null)
+                foreach (XmlNode recipe in recipes.ChildNodes)
                 {
-                    Ingridient newIngridient = new Ingridient();
-                    newIngridient.Name = ingridient["name"].InnerText;
-                    newIngridient.Measure = ingridient["quantity"].Attributes["measure"].Value;
-                    newIngridient.Quantity = Double.Parse(ingridient["quantity"].InnerText);
+                    Recipe newRecipe = new Recipe();
+                    if (recipe.Attributes != null) newRecipe.Id = Int32.Parse(recipe.Attributes["id"].Value);
+                    newRecipe.Name = recipe["name"]?.InnerText;
+                    // ReSharper disable once PossibleNullReferenceException
+                    foreach (XmlNode ingridient in recipe["ingridients"]?.ChildNodes)
+                    {
+                        Ingridient newIngridient = new Ingridient();
+                        newIngridient.Name = ingridient["name"]?.InnerText;
+                        newIngridient.Measure = ingridient["quantity"]?.Attributes["measure"].Value;
+                        newIngridient.Quantity = Double.Parse(ingridient["quantity"]?.InnerText ?? throw new InvalidOperationException());
 
-                    newRecipe.Ingridients.Add(newIngridient);
+                        newRecipe.Ingridients.Add(newIngridient);
+                    }
+                    newRecipe.Cooking = recipe["cooking"]?.InnerText;
+                    newRecipe.NumberOfServings = Int32.Parse(recipe["numberOfServings"]?.InnerText ?? throw new InvalidOperationException());
+                    newRecipe.CalContent.Proteins = Int32.Parse(recipe["caloricContent"]?["proteins"]?.InnerText ?? throw new InvalidOperationException());
+                    newRecipe.CalContent.Fats = Int32.Parse(recipe["caloricContent"]?["fats"]?.InnerText ?? throw new InvalidOperationException());
+                    newRecipe.CalContent.Carbohydrates =
+                        Int32.Parse(recipe["caloricContent"]?["carbohydrates"]?.InnerText ?? throw new InvalidOperationException());
+
+                    _recipes.Add(newRecipe);
                 }
-                newRecipe.Cooking = recipe["cooking"].InnerText;
-                newRecipe.NumberOfServings = Int32.Parse(recipe["numberOfServings"].InnerText);
-                newRecipe.CalContent.Proteins = Int32.Parse(recipe["caloricContent"]["proteins"].InnerText);
-                newRecipe.CalContent.Fats = Int32.Parse(recipe["caloricContent"]["fats"].InnerText);
-                newRecipe.CalContent.Carbohydrates = Int32.Parse(recipe["caloricContent"]["carbohydrates"].InnerText);
-
-                _recipes.Add(newRecipe);
-            }
         }
         private void WriteData()
         {
             XmlDocument doc = new XmlDocument();
             doc.Load("Recipes.xml");
             var recipes = doc.DocumentElement;
-            recipes.RemoveAll();
+            recipes?.RemoveAll();
 
             foreach (var recipe in _recipes)
             {
@@ -74,7 +76,7 @@ namespace BookOfRecipes
                     nameEl.InnerText = ingridient.Name;
                     ingridientEl.AppendChild(nameEl);
                     var quantityEl = doc.CreateElement("quantity");
-                    quantityEl.InnerText = (ingridient.Quantity).ToString();
+                    quantityEl.InnerText = (ingridient.Quantity).ToString(CultureInfo.InvariantCulture);
                     ingridientEl.AppendChild(quantityEl);
                     var measureAttr = doc.CreateAttribute("measure");
                     measureAttr.Value = (ingridient.Measure);
@@ -105,7 +107,7 @@ namespace BookOfRecipes
                 carbohydratesEl.InnerText = (recipe.CalContent.Carbohydrates).ToString();
                 caloricContentEl.AppendChild(carbohydratesEl);
 
-                doc.DocumentElement.AppendChild(recipeEl);
+                if (doc.DocumentElement != null) doc.DocumentElement.AppendChild(recipeEl);
             }
             
             doc.Save("phonebook.xml");
@@ -120,7 +122,7 @@ namespace BookOfRecipes
             {
                 newRecipe.Id = 1;
             }
-            _recipes.Add(newRecipe);
+            if (_recipes != null) _recipes.Add(newRecipe);
             WriteData();
         }
         public void AddRecipe(String newName, List<Ingridient> newIngridients, String newCooking, Int32 newNumberOfServings, CaloricContent newCalContent)
@@ -131,7 +133,7 @@ namespace BookOfRecipes
             newRecipe.Cooking = newCooking;
             newRecipe.NumberOfServings = newNumberOfServings;
             newRecipe.CalContent = newCalContent;
-            if (_recipes != null)
+            if (_recipes != null && _recipes.Count > 0)
             {
                 newRecipe.Id = _recipes.Last().Id;
             }
@@ -139,7 +141,7 @@ namespace BookOfRecipes
             {
                 newRecipe.Id = 1;
             }
-            _recipes.Add(newRecipe);
+            if (_recipes != null) _recipes.Add(newRecipe);
             WriteData();
         }
         public void DelRecipe(Int32 index)
@@ -170,7 +172,7 @@ namespace BookOfRecipes
         {
             if (index >= _recipes.Count)
             {
-                Console.WriteLine("Your index is very big! {0}", index); ;
+                Console.WriteLine("Your index is very big! {0}", index);
             }
             Console.WriteLine(GetRecipe(index).ToString());
         }
